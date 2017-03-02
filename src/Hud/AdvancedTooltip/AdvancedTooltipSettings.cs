@@ -22,5 +22,8 @@ namespace PoeHUD.Hud.AdvancedTooltip
 
         [JsonProperty("Weapon DPS")]
         public WeaponDpsSettings WeaponDps { get; set; }
-    }
+
+		[JsonProperty("Estimated Price")]
+		public ToggleNode EstimatedPrice { get; set; }
+	}
 }
