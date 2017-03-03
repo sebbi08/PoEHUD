@@ -1596,3 +1596,75 @@ Kaom's Sign, Coral Ringwiki	Ring
 Araku Tiki, Coral Amuletwiki	Amulet		
 -75.3%
 0.1 x Chaos Orb	@
+
+#Flasks
+
+Sin's Rebirth, Stibnite Flaskwiki	14	
+-5.2%
+8.0 x Exalted Orb687.9 x Chaos Orb	@
+Dying Sun, Ruby Flaskwiki	68	
+-22.9%
+3.6 x Exalted Orb310.6 x Chaos Orb	@
+Taste of Hate, Sapphire Flaskwiki	18	
+-15.7%
+1.1 x Exalted Orb93.4 x Chaos Orb	@
+Vessel of Vinktar, Penetration, Topaz Flaskwiki	68	
++11.4%
+1.0 x Exalted Orb89.1 x Chaos Orb	@
+Vessel of Vinktar, Added Spells, Topaz Flaskwiki	68	
+-3.0%
+68.6 x Chaos Orb	@
+Vessel of Vinktar, Added Attacks, Topaz Flaskwiki	68	
+-19.7%
+63.8 x Chaos Orb	@
+Vessel of Vinktar, Conversion, Topaz Flaskwiki	68	
+-21.6%
+55.0 x Chaos Orb	@
+Kiara's Determination, Silver Flaskwiki	22	
+-27.0%
+43.0 x Chaos Orb	@
+Lavianga's Spirit, Sanctified Mana Flaskwiki	50	
+-28.5%
+28.8 x Chaos Orb	@
+Blood of the Karui, Sanctified Life Flaskwiki	50	
++40.6%
+14.1 x Chaos Orb	@
+Witchfire Brew, Stibnite Flaskwiki	48	
+-34.9%
+13.0 x Chaos Orb	@
+Lion's Roar, Granite Flaskwiki	27	
+-23.1%
+10.0 x Chaos Orb	@
+Zerphi's Last Breath, Grand Mana Flaskwiki	18	
+-20.0%
+8.0 x Chaos Orb	@
+Rumi's Concoction, Granite Flaskwiki	68	
+-33.2%
+3.0 x Chaos Orb	@
+Divination Distillate, Large Hybrid Flaskwiki	30	
+-16.5%
+3.0 x Chaos Orb	@
+The Writhing Jar, Hallowed Hybrid Flaskwiki	60	
+-44.9%
+1.0 x Chaos Orb	@
+Coruscating Elixir, Ruby Flaskwiki	18	
+-0.3%
+1.0 x Chaos Orb	@
+Doedre's Elixir, Greater Mana Flaskwiki	12	
+-0.6%
+1.0 x Chaos Orb	@
+Atziri's Promise, Amethyst Flaskwiki	68	
+-15.8%
+0.6 x Chaos Orb	@
+Rotgut, Quicksilver Flaskwiki	40	
+-18.4%
+0.3 x Chaos Orb	@
+The Overflowing Chalice, Sulphur Flaskwiki	35	
+-36.8%
+0.3 x Chaos Orb	@
+The Sorrow of the Divine, Sulphur Flaskwiki	35	
+-19.0%
+0.3 x Chaos Orb	@
+Forbidden Taste, Quartz Flaskwiki	27	
+-0.5%
+0.1 x Chaos Orb	@

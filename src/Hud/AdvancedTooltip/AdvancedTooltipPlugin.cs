@@ -128,11 +128,10 @@ namespace PoeHUD.Hud.AdvancedTooltip
 				string price;
 				if (!uniquePrices.TryGetValue(uniqueName, out price))
 					price = "No price for: " + uniqueName;
-				var rc = tooltipRect.TopRight.Translate(-2, -Settings.ItemLevel.TextSize - 2);
-				if (rc.Y < 0) // when tootip touches screen top
-					rc.Y = tooltipRect.Bottom + 2 + Settings.ItemLevel.TextSize;
-				Graphics.DrawText("Est. price: " + price, Settings.ItemLevel.TextSize, rc, Settings.ItemLevel.TextColor, FontDrawFlags.Right);
-
+				else
+					price = "Est. price: " + price;
+				var rc = tooltipRect.BottomRight.Translate(-2, -Settings.ItemLevel.TextSize - 2);
+				Graphics.DrawText(price, Settings.ItemLevel.TextSize, rc, Settings.ItemLevel.TextColor, FontDrawFlags.Right);
 			}
 
 			if (Settings.WeaponDps.Enable && itemEntity.HasComponent<Weapon>())
