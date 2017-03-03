@@ -13,6 +13,7 @@ using SharpDX;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Color = SharpDX.Color;
@@ -28,9 +29,13 @@ namespace PoeHUD.Hud.AdvancedTooltip
         private readonly SettingsHub settingsHub;
         private Entity itemEntity;
 		private int iLvl;
+		private string uniqueName;
         private List<ModValue> mods = new List<ModValue>();
+		private ItemRarity rarity;
 
-        public AdvancedTooltipPlugin(GameController gameController, Graphics graphics, AdvancedTooltipSettings settings, SettingsHub settingsHub)
+		Dictionary<string, string> uniquePrices = LoadUniquePrices();
+
+		public AdvancedTooltipPlugin(GameController gameController, Graphics graphics, AdvancedTooltipSettings settings, SettingsHub settingsHub)
             : base(gameController, graphics, settings)
         {
             this.settingsHub = settingsHub;
@@ -38,35 +43,40 @@ namespace PoeHUD.Hud.AdvancedTooltip
 
         public override void Render()
         {
-            try
-            {
+			try
+			{
 				UpdateToggleState();
 
-                Element uiHover = GameController.Game.IngameState.UIHover;
-                var inventoryItemIcon = uiHover.AsObject<InventoryItemIcon>();
-                if (inventoryItemIcon == null)
-                    return;
+				Element uiHover = GameController.Game.IngameState.UIHover;
+				var inventoryItemIcon = uiHover.AsObject<InventoryItemIcon>();
+				if (inventoryItemIcon == null || inventoryItemIcon.Address == 0)
+					return;
 
 				Entity poeEntity = inventoryItemIcon.Item;
 				if (poeEntity.Address == 0 || !poeEntity.IsValid)
 					return;
 				var modsComponent = poeEntity.GetComponent<Mods>();
-                var id = inventoryItemIcon.ToolTipType == ToolTipType.InventoryItem ? poeEntity.InventoryId : poeEntity.Id;
+				var id = inventoryItemIcon.ToolTipType == ToolTipType.InventoryItem ? poeEntity.InventoryId : poeEntity.Id;
 
-                if (itemEntity == null || itemEntity.Id != id)
-                {
+				if (itemEntity == null || itemEntity.Id != id)
+				{
 					iLvl = modsComponent.ItemLevel;
+					uniqueName = modsComponent.UniqueName;
+					rarity = modsComponent.ItemRarity;
+					//if (string.IsNullOrWhiteSpace(name)) {
+					//	BaseItemType bit = GameController.Files.BaseItemTypes.Translate(poeEntity.Path);
+					//	if (bit != null)
+					//		name = bit.BaseName;
+					//}
 					mods = modsComponent.ItemMods.Select(item => new ModValue(item, GameController.Files, iLvl)).ToList();
-                    itemEntity = poeEntity;
-                }
+					itemEntity = poeEntity;
+				}
 
 				Element tooltip = inventoryItemIcon.Tooltip;
 				if (tooltip != null)
 					DrawItemProperties(tooltip.GetClientRect());
-
-            }
-            catch
-            { }
+			}
+			catch { }
         }
 
 		private void UpdateToggleState()
@@ -113,13 +123,16 @@ namespace PoeHUD.Hud.AdvancedTooltip
 				}
 			}
 
-			if (Settings.EstimatedPrice.Value)
+			if (Settings.EstimatedPrice.Value && rarity == ItemRarity.Unique)
 			{
-				BaseItemType bit = GameController.Files.BaseItemTypes.Translate(itemEntity.Path);
-				if (bit != null) {
-					string name = bit.BaseName;
-					Graphics.DrawText("This is " + name, Settings.ItemLevel.TextSize, tooltipRect.TopRight.Translate(-2, - Settings.ItemLevel.TextSize - 2), Settings.ItemLevel.TextColor, FontDrawFlags.Right);
-				}
+				string price;
+				if (!uniquePrices.TryGetValue(uniqueName, out price))
+					price = "No price for: " + uniqueName;
+				var rc = tooltipRect.TopRight.Translate(-2, -Settings.ItemLevel.TextSize - 2);
+				if (rc.Y < 0) // when tootip touches screen top
+					rc.Y = tooltipRect.Bottom + 2 + Settings.ItemLevel.TextSize;
+				Graphics.DrawText("Est. price: " + price, Settings.ItemLevel.TextSize, rc, Settings.ItemLevel.TextColor, FontDrawFlags.Right);
+
 			}
 
 			if (Settings.WeaponDps.Enable && itemEntity.HasComponent<Weapon>())
@@ -310,5 +323,55 @@ namespace PoeHUD.Hud.AdvancedTooltip
             Graphics.DrawText("dps", settings.DpsNameTextSize, dpsTextPosition, settings.TextColor, FontDrawFlags.Right);
             Graphics.DrawImage("preload-end.png", new RectangleF(textPosition.X - 86, textPosition.Y - 6, 90, 65), settings.BackgroundColor);
         }
-    }
-}
+
+		private static Dictionary<string, string> LoadUniquePrices()
+		{
+			var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			if (!File.Exists("config/unique_prices.txt"))
+				return result; // dict will be empty
+			
+			string[] lines = File.ReadAllLines("config/unique_prices.txt");
+
+			/* Sample line:
+			 * Rigwald's Command, Midnight Bladewiki	One Handed Sword	68	
+			 * +105.6%
+			 * 7.2 x Exalted Orb611.3 x Chaos Orb	@
+			 */
+
+			string name;
+			string[] priceSeparator = new[] { " Orb" };
+			string[] currSeparator = new[] { " x " };
+
+			for (int iLine = 0; iLine < lines.Length - 2; iLine++)
+			{
+				string line = lines[iLine];
+				if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+					continue;
+
+				int ixComma = line.IndexOf(',');
+				if (ixComma < 0) continue; // some wrong data
+				name = line.Substring(0, ixComma);
+
+				iLine += 2;
+				string priceResult = "";
+				string priceTag = lines[iLine];
+				string[] options = priceTag.Split(priceSeparator, StringSplitOptions.RemoveEmptyEntries);
+				foreach(var opt in options)
+				{
+					string[] pp = opt.Split(currSeparator, StringSplitOptions.RemoveEmptyEntries);
+					if (pp.Length != 2)
+						continue;
+
+					if (String.IsNullOrEmpty(priceResult))
+						priceResult = pp[0] + " " + pp[1];
+					else
+						priceResult += " (or " + pp[0] + " " + pp[1] + ")";
+				}
+
+				if (!result.ContainsKey(name)) // some items have many variants - there's a separate line for each, this is not handled. ex: Vessel of Vinktar
+					result.Add(name, priceResult);
+			}
+			return result;
+		}
+	}
+} 
